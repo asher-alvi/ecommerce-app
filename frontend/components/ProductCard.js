@@ -12,7 +12,7 @@ function ProductCard({ product, addToCart }) {
         <h3 className="product-title">{product.title}</h3>
         <p className="product-description">{product.description}</p>
         <div className="product-footer">
-          <span className="product-price">${product.price}</span>
+          <span className="product-price">₹{product.price}</span>
           <button className="add-to-cart-btn" onClick={() => addToCart(product)}>
             Add to Cart
           </button>
