@@ -72,7 +72,7 @@ export default function Home() {
       </main>
       
       <footer className="footer">
-        <p>&copy; 2024 E-Commerce Store. Built with Next.js & Node.js</p>
+        <p>&copy; 2025 E-Commerce Store. Built with Next.js & Node.js</p>
       </footer>
     </div>
   );
