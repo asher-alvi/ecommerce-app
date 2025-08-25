@@ -11,6 +11,19 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
+// Root route - THIS WAS MISSING!
+app.get('/', (req, res) => {
+  res.status(200).json({ 
+    message: 'Ecommerce Backend API is running!',
+    status: 'success',
+    endpoints: {
+      health: '/health',
+      products: '/api/products'
+    },
+    timestamp: new Date().toISOString()
+  });
+});
+
 // Routes
 app.use('/api', productRoutes);
 
@@ -22,3 +35,6 @@ app.get('/health', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+// Export for Vercel
+module.exports = app;
