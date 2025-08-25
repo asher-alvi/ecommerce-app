@@ -10,12 +10,6 @@ export default function Home() {
 
   useEffect(() => {
     fetchProducts();
-
-    // Load cart from localStorage
-    const savedCart = localStorage.getItem('cart');
-    if (savedCart) {
-      setCart(JSON.parse(savedCart));
-    }
   }, []);
 
   const fetchProducts = async () => {
@@ -36,10 +30,8 @@ export default function Home() {
     }
   };
 
-  const handleAddToCart = (product) => {
-    const updatedCart = [...cart, product];
-    setCart(updatedCart);
-    localStorage.setItem('cart', JSON.stringify(updatedCart));
+  const addToCart = (product) => {
+    setCart((prevCart) => [...prevCart, product]);
   };
 
   if (loading) {
@@ -68,7 +60,7 @@ export default function Home() {
       <header className="header">
         <h1>🛒 E-Commerce Store</h1>
         <p>Discover amazing products at great prices</p>
-        <button onClick={() => setIsCartOpen(true)} className="cart-btn">
+        <button className="cart-btn" onClick={() => setIsCartOpen(true)}>
           Cart ({cart.length})
         </button>
       </header>
@@ -76,7 +68,7 @@ export default function Home() {
       <main className="main">
         <div className="products-grid">
           {products.map(product => (
-            <ProductCard key={product.id} product={product} onAddToCart={handleAddToCart} />
+            <ProductCard key={product.id} product={product} addToCart={addToCart} />
           ))}
         </div>
         
@@ -92,27 +84,29 @@ export default function Home() {
         <p>&copy; 2025 E-Commerce Store. Built with Next.js & Node.js</p>
       </footer>
 
-      {/* Cart Sidebar */}
+      {/* Cart Sidebar Drawer */}
       {isCartOpen && (
-        <div className="cart-sidebar">
-          <div className="cart-header">
-            <h2>Your Cart</h2>
-            <button onClick={() => setIsCartOpen(false)} className="close-btn">✖</button>
-          </div>
-          <div className="cart-items">
-            {cart.length === 0 ? (
-              <p>Your cart is empty</p>
-            ) : (
-              cart.map((item, index) => (
-                <div key={index} className="cart-item">
-                  <img src={item.image} alt={item.title} className="cart-item-image" />
-                  <div className="cart-item-info">
-                    <h4>{item.title}</h4>
-                    <p>${item.price}</p>
+        <div className="cart-overlay" onClick={() => setIsCartOpen(false)}>
+          <div className="cart-sidebar" onClick={(e) => e.stopPropagation()}>
+            <div className="cart-header">
+              <h2>Your Cart</h2>
+              <button onClick={() => setIsCartOpen(false)} className="close-btn">✖</button>
+            </div>
+            <div className="cart-items">
+              {cart.length === 0 ? (
+                <p>Your cart is empty</p>
+              ) : (
+                cart.map((item, index) => (
+                  <div key={index} className="cart-item">
+                    <img src={item.image} alt={item.title} className="cart-item-image" />
+                    <div className="cart-item-info">
+                      <h4>{item.title}</h4>
+                      <p>${item.price}</p>
+                    </div>
                   </div>
-                </div>
-              ))
-            )}
+                ))
+              )}
+            </div>
           </div>
         </div>
       )}
