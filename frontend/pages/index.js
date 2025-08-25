@@ -5,10 +5,25 @@ export default function Home() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [cart, setCart] = useState(() => {
+    // ✅ Load from localStorage on first render
+    if (typeof window !== "undefined") {
+      const savedCart = localStorage.getItem("cart");
+      return savedCart ? JSON.parse(savedCart) : [];
+    }
+    return [];
+  });
 
   useEffect(() => {
     fetchProducts();
   }, []);
+
+  useEffect(() => {
+    // ✅ Save cart to localStorage whenever it changes
+    if (typeof window !== "undefined") {
+      localStorage.setItem("cart", JSON.stringify(cart));
+    }
+  }, [cart]);
 
   const fetchProducts = async () => {
     try {
@@ -26,6 +41,11 @@ export default function Home() {
       setError(err.message);
       setLoading(false);
     }
+  };
+
+  const handleAddToCart = (product) => {
+    setCart((prevCart) => [...prevCart, product]);
+    console.log("Cart:", [...cart, product]);
   };
 
   if (loading) {
@@ -54,12 +74,17 @@ export default function Home() {
       <header className="header">
         <h1>🛒 E-Commerce Store</h1>
         <p>Discover amazing products at great prices</p>
+        <p>Cart Items: {cart.length}</p>
       </header>
       
       <main className="main">
         <div className="products-grid">
           {products.map(product => (
-            <ProductCard key={product.id} product={product} />
+            <ProductCard 
+              key={product.id} 
+              product={product} 
+              onAddToCart={handleAddToCart} 
+            />
           ))}
         </div>
         
