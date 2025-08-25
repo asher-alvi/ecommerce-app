@@ -5,25 +5,18 @@ export default function Home() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [cart, setCart] = useState(() => {
-    // ✅ Load from localStorage on first render
-    if (typeof window !== "undefined") {
-      const savedCart = localStorage.getItem("cart");
-      return savedCart ? JSON.parse(savedCart) : [];
-    }
-    return [];
-  });
+  const [cart, setCart] = useState([]);
+  const [isCartOpen, setIsCartOpen] = useState(false);
 
   useEffect(() => {
     fetchProducts();
-  }, []);
 
-  useEffect(() => {
-    // ✅ Save cart to localStorage whenever it changes
-    if (typeof window !== "undefined") {
-      localStorage.setItem("cart", JSON.stringify(cart));
+    // Load cart from localStorage
+    const savedCart = localStorage.getItem('cart');
+    if (savedCart) {
+      setCart(JSON.parse(savedCart));
     }
-  }, [cart]);
+  }, []);
 
   const fetchProducts = async () => {
     try {
@@ -44,8 +37,9 @@ export default function Home() {
   };
 
   const handleAddToCart = (product) => {
-    setCart((prevCart) => [...prevCart, product]);
-    console.log("Cart:", [...cart, product]);
+    const updatedCart = [...cart, product];
+    setCart(updatedCart);
+    localStorage.setItem('cart', JSON.stringify(updatedCart));
   };
 
   if (loading) {
@@ -74,17 +68,15 @@ export default function Home() {
       <header className="header">
         <h1>🛒 E-Commerce Store</h1>
         <p>Discover amazing products at great prices</p>
-        <p>Cart Items: {cart.length}</p>
+        <button onClick={() => setIsCartOpen(true)} className="cart-btn">
+          Cart ({cart.length})
+        </button>
       </header>
       
       <main className="main">
         <div className="products-grid">
           {products.map(product => (
-            <ProductCard 
-              key={product.id} 
-              product={product} 
-              onAddToCart={handleAddToCart} 
-            />
+            <ProductCard key={product.id} product={product} onAddToCart={handleAddToCart} />
           ))}
         </div>
         
@@ -99,6 +91,31 @@ export default function Home() {
       <footer className="footer">
         <p>&copy; 2025 E-Commerce Store. Built with Next.js & Node.js</p>
       </footer>
+
+      {/* Cart Sidebar */}
+      {isCartOpen && (
+        <div className="cart-sidebar">
+          <div className="cart-header">
+            <h2>Your Cart</h2>
+            <button onClick={() => setIsCartOpen(false)} className="close-btn">✖</button>
+          </div>
+          <div className="cart-items">
+            {cart.length === 0 ? (
+              <p>Your cart is empty</p>
+            ) : (
+              cart.map((item, index) => (
+                <div key={index} className="cart-item">
+                  <img src={item.image} alt={item.title} className="cart-item-image" />
+                  <div className="cart-item-info">
+                    <h4>{item.title}</h4>
+                    <p>${item.price}</p>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
